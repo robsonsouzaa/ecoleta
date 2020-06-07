@@ -1,8 +1,9 @@
-import React, { useEffect, useState, ChangeEvent } from 'react';
+import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import { FiArrowLeft } from 'react-icons/fi'
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { Map, TileLayer, Marker} from 'react-leaflet';
 import axios from 'axios';
+import { LeafletMouseEvent } from 'leaflet';
 import api from '../../services/api';
 
 import './styles.css';
@@ -31,6 +32,25 @@ const CriarPonto = () => {
 
   const [estadoSelecionado, setEstadoSelecionado] = useState('0');
   const [cidadeSelecionada, setCidadeSelecionada] = useState('0');
+  const [pontoSelecionado, setPontoSelecionado] = useState<[number, number]>([0, 0]);
+  const [posicaoInicial, setPosicaoInicial] = useState<[number, number]>([0, 0]);
+  const [itemSelecionado, setItemSelecionado] = useState<number[]>([]);
+
+  const [valorForm, setValorForm] = useState({
+    nome: '',
+    email: '',
+    whatsapp: ''
+  });
+
+  const history = useHistory();
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(posicao => {
+      const { latitude, longitude } = posicao.coords;
+
+      setPosicaoInicial([latitude, longitude]);
+    })
+  }, [])
 
   useEffect(() => {
     api.get('itens').then(response => {
@@ -69,6 +89,62 @@ const CriarPonto = () => {
     setCidadeSelecionada(cidade);
   }
 
+  function selecionaPontoMapa(evento: LeafletMouseEvent) {
+    setPontoSelecionado([
+      evento.latlng.lat,
+      evento.latlng.lng,
+    ])
+  }
+
+  function entradaDadosInput(evento: ChangeEvent<HTMLInputElement>) {
+    
+    const { name, value } = evento.target;
+
+    setValorForm({ ...valorForm, [name]: value });
+  }
+
+  function itensSelecionados(id: number) {
+
+    const selecionado = itemSelecionado.findIndex(item => item === id);
+
+    if(selecionado >=0) {
+      
+      const itensfiltrados = itemSelecionado.filter(item => item !== id );
+      setItemSelecionado(itensfiltrados);
+
+    } else {
+      setItemSelecionado([...itemSelecionado, id]);
+    }
+    
+  }
+
+  async function salvar(evento: FormEvent) {
+    
+    evento.preventDefault();
+    
+    const { nome, email, whatsapp } = valorForm;
+    const uf = estadoSelecionado;
+    const cidade = cidadeSelecionada;
+    const [latitude, longitude ] = pontoSelecionado;
+    const itens = itemSelecionado;
+
+    const data = {
+      nome,
+      email,
+      whatsapp,
+      uf,
+      cidade,
+      latitude,
+      longitude,
+      itens,
+    };
+
+    await api.post('pontos', data);
+
+    alert('Ponto de coleta criado1');
+
+    history.push('/');
+  }
 
   return (
     <div id="page-create-point">
@@ -80,7 +156,7 @@ const CriarPonto = () => {
         </Link>
       </header>
 
-      <form>
+      <form onSubmit={salvar}>
         <h1>Cadastro do <br/> ponto de coleta </h1>
 
         <fieldset>
@@ -93,7 +169,9 @@ const CriarPonto = () => {
               <input 
                 type="text"
                 name="nome"
-                id="nome"/>
+                id="nome"
+                onChange={entradaDadosInput}
+                />
             </div>
 
             <div className="field-group">
@@ -102,7 +180,9 @@ const CriarPonto = () => {
                 <input 
                   type="email"
                   name="email"
-                  id="email"/>
+                  id="email"
+                  onChange={entradaDadosInput}
+                />
               </div>
 
               <div className="field">
@@ -110,7 +190,9 @@ const CriarPonto = () => {
                 <input 
                   type="text"
                   name="whatsapp"
-                  id="whatsapp"/>
+                  id="whatsapp"
+                  onChange={entradaDadosInput}
+                />
               </div>
             </div>
 
@@ -122,13 +204,13 @@ const CriarPonto = () => {
             <span>Selecione o endereço no mapa</span>
           </legend>
 
-          <Map center={[-15.6143962, -56.1120188]} zoom={15}>
+          <Map center={posicaoInicial} zoom={15} onClick={selecionaPontoMapa}>
             <TileLayer 
               attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
 
-              <Marker position={[-15.6143962, -56.1120188]} />
+              <Marker position={pontoSelecionado} />
           </Map>
 
           <div className="field-group">
@@ -172,7 +254,11 @@ const CriarPonto = () => {
           <ul className="items-grid">
             {
               itens.map(item => (
-                <li key={item.id}>
+                <li 
+                  key={item.id} 
+                  onClick={() => itensSelecionados(item.id)}
+                  className={itemSelecionado.includes(item.id) ? 'selected' : ''}
+                  >
                 <img src={item.imagem_url} alt={item.titulo}/>
                 <span>{item.titulo}</span>
               </li>
