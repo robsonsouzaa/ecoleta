@@ -17,6 +17,13 @@ class PontosController {
       .distinct()
       .select('pontos.*');
 
+    const pontosSerializados = pontos.map(ponto => {
+        return {
+          ...ponto,
+          imagem_url: `http://192.168.100.13:3333/uploads/${ponto.imagem}`,
+        };
+      });
+
     return response.json(pontos);
   }
 
@@ -30,12 +37,17 @@ class PontosController {
       return response.status(400).json({ mensagem: 'Ponto não encontrado '});
     }
 
+    const pontoSerializado = {
+        ...ponto,
+        imagem_url: `http://192.168.100.13:3333/uploads/${ponto.imagem}`,
+    };
+
     const itens = await knex('itens')
       .join('ponto_itens', 'itens.id', '=', 'ponto_itens.item_id')
       .where('ponto_itens.ponto_id', id)
       .select('itens.titulo');
 
-    return response.json({ ponto, itens});
+    return response.json({ ponto: pontoSerializado, itens});
   }
 
   async create(request: Request, response: Response) {
@@ -54,7 +66,7 @@ class PontosController {
     const trx = await knex.transaction();
 
     const ponto = {
-      imagem: 'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60',
+      imagem: request.file.filename,
       nome,
       email,
       whatsapp,
@@ -68,7 +80,10 @@ class PontosController {
   
     const ponto_id = idsInseridos[0];
   
-    const pontoItens = itens.map((item_id: number) => {
+    const pontoItens = itens
+      .split(',')
+      .map((item: string) => Number(item.trim()))
+      .map((item_id: number) => {
       return {
         item_id,
         ponto_id: ponto_id,
