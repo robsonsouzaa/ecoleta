@@ -6,6 +6,8 @@ import axios from 'axios';
 import { LeafletMouseEvent } from 'leaflet';
 import api from '../../services/api';
 
+import Dropzone from '../../componentes/Dropzone';
+
 import './styles.css';
 import logo from '../../assets/logo.svg';
 
@@ -35,6 +37,7 @@ const CriarPonto = () => {
   const [pontoSelecionado, setPontoSelecionado] = useState<[number, number]>([0, 0]);
   const [posicaoInicial, setPosicaoInicial] = useState<[number, number]>([0, 0]);
   const [itemSelecionado, setItemSelecionado] = useState<number[]>([]);
+  const [arquivoSelecioando, setArquivoSelecionado] = useState<File>();
 
   const [valorForm, setValorForm] = useState({
     nome: '',
@@ -128,17 +131,21 @@ const CriarPonto = () => {
     const [latitude, longitude ] = pontoSelecionado;
     const itens = itemSelecionado;
 
-    const data = {
-      nome,
-      email,
-      whatsapp,
-      uf,
-      cidade,
-      latitude,
-      longitude,
-      itens,
-    };
+    const data = new FormData();
 
+    data.append('nome', nome);
+    data.append('email', email);
+    data.append('whatsapp', whatsapp);
+    data.append('uf', uf);
+    data.append('cidade', cidade);
+    data.append('latitude', String(latitude));
+    data.append('longitude', String(longitude));
+    data.append('itens', itens.join(','));
+    
+    if(arquivoSelecioando) {
+      data.append('imagem', arquivoSelecioando);
+    }
+    
     await api.post('pontos', data);
 
     alert('Ponto de coleta criado1');
@@ -158,6 +165,8 @@ const CriarPonto = () => {
 
       <form onSubmit={salvar}>
         <h1>Cadastro do <br/> ponto de coleta </h1>
+
+        <Dropzone arquivoUpado={setArquivoSelecionado}/>
 
         <fieldset>
           <legend>
