@@ -10,6 +10,7 @@
 
 **Ecoleta** é um marketplace de coleta de resídios, possibilitando pessoas encontrarem pontos de coleta de acordo com os filtros informados. 💪
 
+<img src ="/web/src/assets/web.png">
 <br>
 
 ## :rocket: Tecnologias
