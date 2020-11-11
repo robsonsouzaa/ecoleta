@@ -1,12 +1,30 @@
-<h1 align="center">
-  <img src ="/web/src/assets/logo.svg">
-</h1>
-<h2 align="center">
-  Semana Next Level Week 1.0
-</h2>
+<div align="center">
+  <h1>
+    <img src ="/web/src/assets/logo.svg">
+  </h1>
+
+  <p>
+    Ajudamos pessoas a encontrarem pontos de coleta de forma eficiente.
+  </p>
+  
+  <p align="center">
+  <img src="https://img.shields.io/badge/next level week-1-34cb79?style=for-the-badge" alt="Sistema web Ok" />
+  
+  <img src="https://img.shields.io/badge/status-concluído-34cb79?style=for-the-badge" alt="Sistema web Ok" />
+  
+  <img alt="Repository size" src="https://img.shields.io/github/repo-size/robsonsouzaa/ecoleta?style=for-the-badge&color=34cb79">
+
+  <a href="https://github.com/danielccunha/ecoleta/commits/master">
+    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/robsonsouzaa/happy?style=for-the-badge&color=34cb79">
+  </a>
+
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-brightgreen?style=for-the-badge&color=34cb79">  
+</p>
+</div>
+
 <br>
 
-## Projeto 💻
+## 💻 Sobre o projeto
 
 **Ecoleta** é um marketplace de coleta de resídios, possibilitando pessoas encontrarem pontos de coleta de acordo com os filtros informados. 💪
 
