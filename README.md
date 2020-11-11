@@ -50,9 +50,3 @@ Esse projeto foi desenvolvido com as seguintes tecnologias:
 
 Depois que o merge da sua pull request for feito, você pode deletar a sua branch.
 
-## Licença :memo:
-
-[![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org)
-- **[MIT license](https://github.com/leoronne/BeTheHero/blob/master/LICENSE)**
-
-## 
